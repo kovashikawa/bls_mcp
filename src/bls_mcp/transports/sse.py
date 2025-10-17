@@ -19,19 +19,19 @@ logger = get_logger(__name__)
 
 class SSETransport:
     """Server-Sent Events transport for MCP server."""
-    
-    def __init__(self, mcp_server):
+
+    def __init__(self, mcp_server: Any) -> None:
         self.mcp_server = mcp_server
         self.app = self._create_app()
-    
-    def _create_app(self):
+
+    def _create_app(self) -> Starlette:
         """Create Starlette app with SSE endpoints."""
         
-        async def health_check(request: Request):
+        async def health_check(request: Request) -> JSONResponse:
             """Health check endpoint."""
             return JSONResponse({"status": "healthy", "transport": "sse"})
-        
-        async def root_endpoint(request: Request):
+
+        async def root_endpoint(request: Request) -> JSONResponse:
             """Root endpoint with server information."""
             return JSONResponse({
                 "name": "BLS MCP Server",
@@ -45,7 +45,7 @@ class SSETransport:
                 "description": "Bureau of Labor Statistics data server via MCP protocol"
             })
         
-        async def mcp_info(request: Request):
+        async def mcp_info(request: Request) -> JSONResponse:
             """MCP endpoint info (GET request)."""
             return JSONResponse({
                 "message": "MCP endpoint - use POST requests",
@@ -58,9 +58,9 @@ class SSETransport:
                 }
             })
         
-        async def sse_endpoint(request: Request):
+        async def sse_endpoint(request: Request) -> EventSourceResponse:
             """SSE endpoint for MCP communication."""
-            async def event_generator():
+            async def event_generator() -> Any:
                 try:
                     # Send initial connection event
                     yield {
@@ -86,7 +86,7 @@ class SSETransport:
             
             return EventSourceResponse(event_generator())
         
-        async def handle_mcp_request(request: Request):
+        async def handle_mcp_request(request: Request) -> JSONResponse:
             """Handle MCP requests via HTTP POST."""
             try:
                 body = await request.json()
@@ -216,7 +216,7 @@ class SSETransport:
         
         return app
     
-    async def run(self, host: str = "localhost", port: int = 3000):
+    async def run(self, host: str = "localhost", port: int = 3000) -> None:
         """Run the SSE server."""
         import uvicorn
         

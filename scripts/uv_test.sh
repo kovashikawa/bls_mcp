@@ -9,8 +9,8 @@ PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 
 cd "$PROJECT_DIR"
 
-# Install dev dependencies if needed
-uv sync --all-extras
+# Install dev dependencies if needed (use full path for Claude Desktop compatibility)
+/Users/rafaelkovashikawa/.local/bin/uv sync --all-extras
 
 # Run tests with uv
-uv run pytest tests/ -v "$@"
+/Users/rafaelkovashikawa/.local/bin/uv run pytest tests/ -v "$@"

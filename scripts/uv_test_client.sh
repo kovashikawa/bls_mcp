@@ -9,5 +9,5 @@ PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 
 cd "$PROJECT_DIR"
 
-# Run test client with uv
-uv run python scripts/test_mcp_client.py
+# Run test client with uv (use full path for Claude Desktop compatibility)
+/Users/rafaelkovashikawa/.local/bin/uv run python scripts/test_mcp_client.py

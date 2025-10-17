@@ -2,7 +2,7 @@
 
 import json
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 
 class MockDataProvider:
@@ -11,10 +11,10 @@ class MockDataProvider:
     def __init__(self) -> None:
         """Initialize mock data provider."""
         self.fixtures_dir = Path(__file__).parent / "fixtures"
-        self._series_catalog: Optional[Dict[str, Any]] = None
-        self._historical_data: Optional[Dict[str, Any]] = None
+        self._series_catalog: dict[str, Any] | None = None
+        self._historical_data: dict[str, Any] | None = None
 
-    def _load_series_catalog(self) -> Dict[str, Any]:
+    def _load_series_catalog(self) -> dict[str, Any]:
         """Load series catalog from JSON fixture."""
         if self._series_catalog is None:
             catalog_path = self.fixtures_dir / "cpi_series.json"
@@ -22,7 +22,7 @@ class MockDataProvider:
                 self._series_catalog = json.load(f)
         return self._series_catalog
 
-    def _load_historical_data(self) -> Dict[str, Any]:
+    def _load_historical_data(self) -> dict[str, Any]:
         """Load historical data from JSON fixture."""
         if self._historical_data is None:
             data_path = self.fixtures_dir / "historical_data.json"
@@ -33,9 +33,9 @@ class MockDataProvider:
     async def get_series(
         self,
         series_id: str,
-        start_year: Optional[int] = None,
-        end_year: Optional[int] = None,
-    ) -> Dict[str, Any]:
+        start_year: int | None = None,
+        end_year: int | None = None,
+    ) -> dict[str, Any]:
         """
         Get data for a specific series.
 
@@ -72,7 +72,7 @@ class MockDataProvider:
 
         # Get series metadata
         catalog = self._load_series_catalog()
-        metadata = next(
+        metadata: dict[str, Any] = next(
             (s for s in catalog["series"] if s["series_id"] == series_id), {}
         )
 
@@ -84,8 +84,8 @@ class MockDataProvider:
         }
 
     async def list_series(
-        self, category: Optional[str] = None, limit: int = 50
-    ) -> List[Dict[str, Any]]:
+        self, category: str | None = None, limit: int = 50
+    ) -> list[dict[str, Any]]:
         """
         List available series with optional filtering.
 
@@ -108,9 +108,9 @@ class MockDataProvider:
         # Apply limit
         series_list = series_list[:limit]
 
-        return series_list
+        return list(series_list)
 
-    async def get_series_info(self, series_id: str) -> Dict[str, Any]:
+    async def get_series_info(self, series_id: str) -> dict[str, Any]:
         """
         Get metadata information about a specific series.
 
@@ -141,7 +141,7 @@ class MockDataProvider:
 
         raise ValueError(f"Series '{series_id}' not found")
 
-    async def search_series(self, query: str, limit: int = 10) -> List[Dict[str, Any]]:
+    async def search_series(self, query: str, limit: int = 10) -> list[dict[str, Any]]:
         """
         Search for series by title or description.
 
