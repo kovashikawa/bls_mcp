@@ -14,6 +14,29 @@ A standalone MCP (Model Context Protocol) server for Bureau of Labor Statistics 
 
 ### Installation
 
+#### Option 1: Using UV (Recommended - 10x faster!)
+
+```bash
+# Install uv (if not already installed)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Navigate to project
+cd bls_mcp
+
+# Sync dependencies (creates .venv automatically)
+uv sync
+
+# Run the server
+./scripts/uv_start_server.sh
+
+# Test the server
+./scripts/uv_test_client.sh
+```
+
+See [UV_USAGE.md](docs/UV_USAGE.md) for comprehensive UV documentation.
+
+#### Option 2: Using pip (Traditional)
+
 ```bash
 # Clone the repository
 cd bls_mcp
@@ -32,7 +55,10 @@ pip install -e ".[dev]"
 ### Running the Server (Local)
 
 ```bash
-# Start MCP server with stdio transport
+# With UV (recommended)
+./scripts/uv_start_server.sh
+
+# Or with traditional Python
 python scripts/start_server.py
 ```
 
