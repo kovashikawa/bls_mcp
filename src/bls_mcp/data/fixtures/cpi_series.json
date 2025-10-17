@@ -1,0 +1,84 @@
+{
+  "series": [
+    {
+      "series_id": "CUUR0000SA0",
+      "series_title": "Consumer Price Index for All Urban Consumers: All Items in U.S. City Average",
+      "survey_name": "Consumer Price Index",
+      "area": "U.S. City Average",
+      "item": "All Items",
+      "seasonality": "Seasonally Adjusted",
+      "base_period": "1982-84=100",
+      "category": "CPI"
+    },
+    {
+      "series_id": "CUUR0000SAF",
+      "series_title": "Consumer Price Index for All Urban Consumers: Food in U.S. City Average",
+      "survey_name": "Consumer Price Index",
+      "area": "U.S. City Average",
+      "item": "Food",
+      "seasonality": "Seasonally Adjusted",
+      "base_period": "1982-84=100",
+      "category": "CPI"
+    },
+    {
+      "series_id": "CUUR0000SAF11",
+      "series_title": "Consumer Price Index for All Urban Consumers: Food at Home in U.S. City Average",
+      "survey_name": "Consumer Price Index",
+      "area": "U.S. City Average",
+      "item": "Food at Home",
+      "seasonality": "Seasonally Adjusted",
+      "base_period": "1982-84=100",
+      "category": "CPI"
+    },
+    {
+      "series_id": "CUUR0000SETA",
+      "series_title": "Consumer Price Index for All Urban Consumers: Energy in U.S. City Average",
+      "survey_name": "Consumer Price Index",
+      "area": "U.S. City Average",
+      "item": "Energy",
+      "seasonality": "Seasonally Adjusted",
+      "base_period": "1982-84=100",
+      "category": "CPI"
+    },
+    {
+      "series_id": "CUUR0000SAH",
+      "series_title": "Consumer Price Index for All Urban Consumers: Housing in U.S. City Average",
+      "survey_name": "Consumer Price Index",
+      "area": "U.S. City Average",
+      "item": "Housing",
+      "seasonality": "Seasonally Adjusted",
+      "base_period": "1982-84=100",
+      "category": "CPI"
+    },
+    {
+      "series_id": "CUUR0000SETA01",
+      "series_title": "Consumer Price Index for All Urban Consumers: Gasoline (All Types) in U.S. City Average",
+      "survey_name": "Consumer Price Index",
+      "area": "U.S. City Average",
+      "item": "Gasoline (All Types)",
+      "seasonality": "Seasonally Adjusted",
+      "base_period": "1982-84=100",
+      "category": "CPI"
+    },
+    {
+      "series_id": "CUUR0000SAT",
+      "series_title": "Consumer Price Index for All Urban Consumers: Transportation in U.S. City Average",
+      "survey_name": "Consumer Price Index",
+      "area": "U.S. City Average",
+      "item": "Transportation",
+      "seasonality": "Seasonally Adjusted",
+      "base_period": "1982-84=100",
+      "category": "CPI"
+    },
+    {
+      "series_id": "CUUR0000SAM",
+      "series_title": "Consumer Price Index for All Urban Consumers: Medical Care in U.S. City Average",
+      "survey_name": "Consumer Price Index",
+      "area": "U.S. City Average",
+      "item": "Medical Care",
+      "seasonality": "Seasonally Adjusted",
+      "base_period": "1982-84=100",
+      "category": "CPI"
+    }
+  ]
+}
