@@ -33,6 +33,10 @@ class SSETransport:
 
         async def root_endpoint(request: Request) -> JSONResponse:
             """Root endpoint with server information."""
+            # Get tool count dynamically
+            tool_count = len(self.mcp_server.tools) if hasattr(self.mcp_server, 'tools') else 0
+            tool_names = list(self.mcp_server.tools.keys()) if hasattr(self.mcp_server, 'tools') else []
+
             return JSONResponse({
                 "name": "BLS MCP Server",
                 "version": "1.18.0",
@@ -41,6 +45,10 @@ class SSETransport:
                     "health": "/health",
                     "mcp": "/mcp (POST only)",
                     "sse": "/sse"
+                },
+                "tools": {
+                    "count": tool_count,
+                    "available": tool_names
                 },
                 "description": "Bureau of Labor Statistics data server via MCP protocol"
             })
@@ -114,43 +122,16 @@ class SSETransport:
                         }
                     }
                 elif method == "tools/list":
-                    tools = [
-                        {
-                            "name": "get_series",
-                            "description": "Fetch BLS data series by ID with optional date range filtering",
-                            "inputSchema": {
-                                "type": "object",
-                                "properties": {
-                                    "series_id": {"type": "string", "description": "BLS series ID"},
-                                    "start_year": {"type": "integer", "description": "Start year"},
-                                    "end_year": {"type": "integer", "description": "End year"}
-                                },
-                                "required": ["series_id"]
-                            }
-                        },
-                        {
-                            "name": "list_series",
-                            "description": "List available BLS data series",
-                            "inputSchema": {
-                                "type": "object",
-                                "properties": {
-                                    "category": {"type": "string", "description": "Filter by category"},
-                                    "limit": {"type": "integer", "description": "Maximum results"}
-                                }
-                            }
-                        },
-                        {
-                            "name": "get_series_info",
-                            "description": "Get detailed metadata about a series",
-                            "inputSchema": {
-                                "type": "object",
-                                "properties": {
-                                    "series_id": {"type": "string", "description": "BLS series ID"}
-                                },
-                                "required": ["series_id"]
-                            }
-                        }
-                    ]
+                    # Dynamically get tools from MCP server
+                    tools = []
+                    if hasattr(self.mcp_server, 'tools'):
+                        for tool_name, tool in self.mcp_server.tools.items():
+                            tools.append({
+                                "name": tool.name,
+                                "description": tool.description,
+                                "inputSchema": tool.input_schema.model_json_schema()
+                            })
+
                     response = {
                         "jsonrpc": "2.0",
                         "id": request_id,

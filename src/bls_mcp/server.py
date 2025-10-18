@@ -15,6 +15,18 @@ from .tools.get_series_info import GetSeriesInfoTool
 from .tools.list_series import ListSeriesTool
 from .utils.logger import get_logger, setup_logging
 
+# Try to import visualization tool (optional dependency)
+try:
+    from .tools.plot_series import PlotSeriesTool
+    VISUALIZATION_AVAILABLE = True
+except ImportError:
+    VISUALIZATION_AVAILABLE = False
+    logger = get_logger(__name__)
+    logger.warning(
+        "Visualization tools not available. "
+        "Install with: uv sync --extra viz"
+    )
+
 # Load environment variables
 load_dotenv()
 
@@ -46,6 +58,13 @@ class BLSMCPServer:
             "list_series": ListSeriesTool(self.data_provider),
             "get_series_info": GetSeriesInfoTool(self.data_provider),
         }
+
+        # Add visualization tool if available
+        if VISUALIZATION_AVAILABLE:
+            self.tools["plot_series"] = PlotSeriesTool(self.data_provider)
+            logger.info("Visualization tool (plot_series) registered")
+        else:
+            logger.info("Visualization tool not available (install with: uv sync --extra viz)")
 
         # Register handlers
         self._register_handlers()

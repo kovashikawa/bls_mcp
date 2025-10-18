@@ -74,18 +74,29 @@ mcp-inspector python scripts/start_server.py
 
 ## Project Status
 
-**Current Phase**: Phase 1 - Foundation
+**Current Phase**: Phase 2 - Enhanced Tools (Starting Visualization)
 
+### Phase 1 - Foundation ✅ COMPLETE
 - [x] Project structure created
 - [x] Configuration files set up
-- [ ] Mock data system implemented
-- [ ] Core MCP server implemented
-- [ ] Basic tools implemented
-- [ ] Tests written
+- [x] Mock data system implemented (8 CPI series, 114 data points)
+- [x] Core MCP server implemented with stdio transport
+- [x] Basic tools implemented (get_series, list_series, get_series_info)
+- [x] 17 unit tests written (all passing)
+- [x] UV package manager integration
+- [x] SSE transport + ngrok support (bonus!)
+- [x] Claude Desktop integration guide
 
-## Available Tools (Phase 1)
+### Phase 2 - Enhanced Tools (In Progress)
+- [x] Simple visualization tool (static plots) - `plot_series` tool
+- [ ] Advanced analysis tools
+- [ ] Data comparison tools
 
-### `get_series`
+## Available Tools
+
+### Phase 1 Tools - Data Access
+
+#### `get_series`
 Fetch BLS data series by ID with optional date range filtering.
 
 **Parameters:**
@@ -105,18 +116,54 @@ Fetch BLS data series by ID with optional date range filtering.
 }
 ```
 
-### `list_series`
+#### `list_series`
 List available BLS series with optional filtering.
 
 **Parameters:**
 - `category` (string, optional): Filter by category (e.g., "CPI", "Employment")
 - `limit` (integer, optional): Maximum number of results (default: 50)
 
-### `get_series_info`
+#### `get_series_info`
 Get detailed metadata about a specific BLS series.
 
 **Parameters:**
 - `series_id` (string, required): BLS series ID
+
+### Phase 2 Tools - Visualization (NEW!)
+
+#### `plot_series`
+Create a simple static plot (line or bar chart) of a BLS data series.
+
+**Features:**
+- Line charts for time series trends
+- Bar charts for comparing values
+- Returns base64-encoded PNG images
+- Automatic date formatting
+- Clean, readable design
+
+**Parameters:**
+- `series_id` (string, required): BLS series ID to plot
+- `start_year` (integer, optional): Start year for data range
+- `end_year` (integer, optional): End year for data range
+- `chart_type` (string, optional): Chart type - "line" (default) or "bar"
+
+**Example:**
+```json
+{
+  "name": "plot_series",
+  "arguments": {
+    "series_id": "CUUR0000SA0",
+    "start_year": 2023,
+    "end_year": 2024,
+    "chart_type": "line"
+  }
+}
+```
+
+**Note:** Visualization tools require the `viz` extra. Install with:
+```bash
+uv sync --all-extras
+```
 
 ## Architecture
 
@@ -201,23 +248,27 @@ mypy src/
 
 ## Roadmap
 
-### Phase 1: Foundation (Current)
+### Phase 1: Foundation ✅ COMPLETE
 - [x] Project setup and configuration
-- [ ] Mock data system
-- [ ] Core MCP server with stdio transport
-- [ ] Basic tools (get_series, list_series, get_series_info)
-- [ ] Unit tests
+- [x] Mock data system
+- [x] Core MCP server with stdio transport
+- [x] Basic tools (get_series, list_series, get_series_info)
+- [x] Unit tests (17 tests, all passing)
+- [x] UV package manager integration
+- [x] SSE transport implementation (bonus!)
+- [x] ngrok integration (bonus!)
+- [x] Claude Desktop integration guide
 
-### Phase 2: Remote Access
-- [ ] SSE transport implementation
-- [ ] ngrok integration
+### Phase 2: Enhanced Tools (In Progress)
+- [ ] Visualization tools (simple static plots)
+- [ ] Data comparison and analysis tools
 - [ ] Multi-LLM client testing
-- [ ] Enhanced tools with visualization
+- [ ] Enhanced error handling and validation
 
 ### Phase 3: Advanced Features
 - [ ] MCP resources (catalogs, documentation)
 - [ ] Pre-built prompts for analysis
-- [ ] Advanced analysis tools
+- [ ] Advanced visualization (interactive charts)
 - [ ] Migration path to real BLS data
 
 ## Configuration
