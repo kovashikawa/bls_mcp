@@ -135,17 +135,25 @@ class PlotSeriesTool(BaseTool):
                 "error": "No data points available for the specified range",
             }
 
-        # Parse dates and values
-        dates = []
-        values = []
+        # Parse dates and values, then sort chronologically
+        # BLS API returns data in reverse chronological order (newest first)
+        data_tuples = []
         for point in data_points:
             # Format: YYYY-MM (e.g., "2023-01")
             year = point["year"]
             period = point["period"]
             # Period format is M01, M02, etc.
-            month = period.replace("M", "")
-            dates.append(f"{year}-{month}")
-            values.append(float(point["value"]))
+            month = period.replace("M", "").zfill(2)  # Ensure 2-digit month
+            date_str = f"{year}-{month}"
+            value = float(point["value"])
+            data_tuples.append((date_str, value))
+
+        # Sort by date (oldest first)
+        data_tuples.sort(key=lambda x: x[0])
+
+        # Extract sorted dates and values
+        dates = [d[0] for d in data_tuples]
+        values = [d[1] for d in data_tuples]
 
         # Create the plot
         fig, ax = plt.subplots(figsize=(10, 6))

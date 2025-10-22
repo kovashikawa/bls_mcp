@@ -7,7 +7,7 @@ from typing import Any, Sequence
 from dotenv import load_dotenv
 from mcp.server import Server
 from mcp.server.stdio import stdio_server
-from mcp.types import Tool, TextContent
+from mcp.types import Tool, TextContent, ImageContent
 
 from .data.mock_data import MockDataProvider
 from .tools.get_series import GetSeriesTool
@@ -88,7 +88,7 @@ class BLSMCPServer:
             ]
 
         @self.server.call_tool()
-        async def call_tool(name: str, arguments: dict[str, Any]) -> Sequence[TextContent]:
+        async def call_tool(name: str, arguments: dict[str, Any]) -> Sequence[TextContent | ImageContent]:
             """Call a tool by name with arguments."""
             logger.info(f"Tool called: {name}")
             logger.debug(f"Arguments: {arguments}")
@@ -107,6 +107,30 @@ class BLSMCPServer:
                 # Convert result to JSON string for text content
                 import json
 
+                # Special handling for plot_series tool - return both text and image
+                if name == "plot_series" and result.get("status") == "success":
+                    # Extract image data
+                    image_data = result.get("image", {}).get("data", "")
+
+                    # Create summary without the base64 data
+                    summary = {
+                        "status": result["status"],
+                        "series_id": result["series_id"],
+                        "title": result["title"],
+                        "chart_type": result["chart_type"],
+                        "data_points": result["data_points"],
+                        "date_range": result["date_range"],
+                        "value_range": result["value_range"],
+                        "message": result["message"]
+                    }
+
+                    # Return both text summary and image
+                    return [
+                        # TextContent(type="text", text=json.dumps(summary, indent=2)),
+                        ImageContent(type="image", data=image_data, mimeType="image/png")
+                    ]
+
+                # Default: return as JSON text
                 result_text = json.dumps(result, indent=2)
                 return [TextContent(type="text", text=result_text)]
 
