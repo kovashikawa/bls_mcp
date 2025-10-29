@@ -102,35 +102,38 @@ class BLSMCPServer:
 
             try:
                 result = await tool.execute(arguments)
-                logger.debug(f"Tool result: {result}")
+                logger.info(f"Tool {name} returned status: {result.get('status')}")
 
                 # Convert result to JSON string for text content
                 import json
 
-                # Special handling for plot_series tool - return both text and image
-                if name == "plot_series" and result.get("status") == "success":
-                    # Extract image data
-                    image_data = result.get("image", {}).get("data", "")
+                # Special handling for plot_series tool - return text + image
+                if name == "plot_series":
+                    logger.info("Processing plot_series response")
 
-                    # Create summary without the base64 data
-                    summary = {
-                        "status": result["status"],
-                        "series_id": result["series_id"],
-                        "title": result["title"],
-                        "chart_type": result["chart_type"],
-                        "data_points": result["data_points"],
-                        "date_range": result["date_range"],
-                        "value_range": result["value_range"],
-                        "message": result["message"]
-                    }
+                    if result.get("status") == "success":
+                        # Extract image data
+                        image_data = result.get("image", {}).get("data", "")
+                        logger.info(f"Image data length: {len(image_data)}")
 
-                    # Return both text summary and image
-                    return [
-                        # TextContent(type="text", text=json.dumps(summary, indent=2)),
-                        ImageContent(type="image", data=image_data, mimeType="image/png")
-                    ]
+                        # Create a simple text description
+                        text_summary = (
+                            f"CPI All Items (CUUR0000SA0)\n"
+                            f"Data points: {result.get('data_points')}\n"
+                            f"Range: {result.get('date_range')}"
+                        )
+
+                        logger.info("Returning ImageContent")
+                        # Return both text and image
+                        return [
+                            TextContent(type="text", text=text_summary),
+                            ImageContent(type="image", data=image_data, mimeType="image/png")
+                        ]
+                    else:
+                        logger.warning(f"plot_series failed: {result.get('error')}")
 
                 # Default: return as JSON text
+                logger.info("Returning default JSON text response")
                 result_text = json.dumps(result, indent=2)
                 return [TextContent(type="text", text=result_text)]
 
