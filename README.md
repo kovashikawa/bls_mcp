@@ -129,41 +129,68 @@ Get detailed metadata about a specific BLS series.
 **Parameters:**
 - `series_id` (string, required): BLS series ID
 
-### Phase 2 Tools - Visualization (NEW!)
+### Phase 2 Tools - Data Formatting for Visualization
 
 #### `plot_series`
-Create a simple static plot (line or bar chart) of a BLS data series.
+Get CPI All Items (CUUR0000SA0) data formatted for client-side plotting.
 
 **Features:**
-- Line charts for time series trends
-- Bar charts for comparing values
-- Returns base64-encoded PNG images
-- Automatic date formatting
-- Clean, readable design
+- Returns structured time series data ready for plotting
+- No parameters needed - hardcoded to CPI All Items
+- Includes statistics (min, max, average)
+- Chronologically sorted data
+- Plot instructions for client-side rendering
 
 **Parameters:**
-- `series_id` (string, required): BLS series ID to plot
-- `start_year` (integer, optional): Start year for data range
-- `end_year` (integer, optional): End year for data range
-- `chart_type` (string, optional): Chart type - "line" (default) or "bar"
+- None required
+
+**Returns:**
+- `data`: Array of {date, value, year, month, period} objects
+- `statistics`: {count, min, max, average}
+- `date_range`: {start, end}
+- `plot_instructions`: Suggested chart settings
+- `series_title`: Full series name
 
 **Example:**
 ```json
 {
   "name": "plot_series",
-  "arguments": {
-    "series_id": "CUUR0000SA0",
-    "start_year": 2023,
-    "end_year": 2024,
-    "chart_type": "line"
+  "arguments": {}
+}
+```
+
+**Example Response:**
+```json
+{
+  "status": "success",
+  "series_id": "CUUR0000SA0",
+  "series_title": "Consumer Price Index for All Urban Consumers: All Items",
+  "data": [
+    {"date": "2020-01", "value": 257.971, "year": "2020", "month": "01", "period": "M01"},
+    ...
+  ],
+  "statistics": {
+    "count": 60,
+    "min": 257.971,
+    "max": 314.540,
+    "average": 285.234
+  },
+  "date_range": {
+    "start": "2020-01",
+    "end": "2024-12"
+  },
+  "plot_instructions": {
+    "chart_type": "line",
+    "x_axis": "date",
+    "y_axis": "value",
+    "title": "Consumer Price Index for All Urban Consumers: All Items",
+    "x_label": "Date",
+    "y_label": "Index Value"
   }
 }
 ```
 
-**Note:** Visualization tools require the `viz` extra. Install with:
-```bash
-uv sync --all-extras
-```
+**Note:** This tool returns data for client-side plotting, not pre-rendered images. The client (ChatGPT, Claude, etc.) can use this data to create charts in their own environment.
 
 ## Architecture
 

@@ -1,6 +1,5 @@
-"""Tests for plot_series visualization tool."""
+"""Tests for plot_series data formatting tool."""
 
-import base64
 import pytest
 
 from bls_mcp.data.mock_data import MockDataProvider
@@ -25,120 +24,123 @@ class TestPlotSeriesTool:
     def test_tool_properties(self, plot_tool):
         """Test tool has correct properties."""
         assert plot_tool.name == "plot_series"
-        assert "plot" in plot_tool.description.lower()
+        assert "plot" in plot_tool.description.lower() or "data" in plot_tool.description.lower()
         assert plot_tool.input_schema is not None
 
     @pytest.mark.asyncio
-    async def test_plot_line_chart(self, plot_tool):
-        """Test creating a line chart."""
-        result = await plot_tool.execute({
-            "series_id": "CUUR0000SA0",
-            "start_year": 2023,
-            "end_year": 2024,
-            "chart_type": "line"
-        })
+    async def test_plot_returns_data(self, plot_tool):
+        """Test that plot_series returns formatted data."""
+        result = await plot_tool.execute({})
 
         assert result["status"] == "success"
         assert result["series_id"] == "CUUR0000SA0"
-        assert result["chart_type"] == "line"
-        assert result["data_points"] > 0
-        assert "image" in result
-        assert result["image"]["format"] == "png"
-        assert result["image"]["encoding"] == "base64"
-
-        # Verify base64 data is valid
-        image_data = result["image"]["data"]
-        assert isinstance(image_data, str)
-        assert len(image_data) > 0
-
-        # Try to decode base64
-        try:
-            decoded = base64.b64decode(image_data)
-            # Check PNG header
-            assert decoded[:8] == b'\x89PNG\r\n\x1a\n'
-        except Exception as e:
-            pytest.fail(f"Failed to decode base64 image: {e}")
+        assert "data" in result
+        assert isinstance(result["data"], list)
+        assert len(result["data"]) > 0
 
     @pytest.mark.asyncio
-    async def test_plot_bar_chart(self, plot_tool):
-        """Test creating a bar chart."""
-        result = await plot_tool.execute({
-            "series_id": "CUUR0000SA0",
-            "chart_type": "bar"
-        })
+    async def test_data_format(self, plot_tool):
+        """Test that data has correct format for plotting."""
+        result = await plot_tool.execute({})
 
         assert result["status"] == "success"
-        assert result["chart_type"] == "bar"
-        assert "image" in result
+
+        # Check first data point has required fields
+        first_point = result["data"][0]
+        assert "date" in first_point
+        assert "value" in first_point
+        assert "year" in first_point
+        assert "month" in first_point
+        assert "period" in first_point
+
+        # Verify data types
+        assert isinstance(first_point["date"], str)
+        assert isinstance(first_point["value"], (int, float))
+        assert isinstance(first_point["year"], str)
 
     @pytest.mark.asyncio
-    async def test_plot_with_date_range(self, plot_tool):
-        """Test plotting with specific date range."""
-        result = await plot_tool.execute({
-            "series_id": "CUUR0000SA0",
-            "start_year": 2023,
-            "end_year": 2023
-        })
+    async def test_statistics_included(self, plot_tool):
+        """Test that statistics are included."""
+        result = await plot_tool.execute({})
 
         assert result["status"] == "success"
-        assert "2023" in result["date_range"]["start"]
-        assert "2023" in result["date_range"]["end"]
+        assert "statistics" in result
 
-    @pytest.mark.asyncio
-    async def test_plot_invalid_series(self, plot_tool):
-        """Test plotting with invalid series ID."""
-        result = await plot_tool.execute({
-            "series_id": "INVALID123"
-        })
-
-        assert result["status"] == "error"
-
-    @pytest.mark.asyncio
-    async def test_plot_value_statistics(self, plot_tool):
-        """Test that value statistics are included."""
-        result = await plot_tool.execute({
-            "series_id": "CUUR0000SA0"
-        })
-
-        assert result["status"] == "success"
-        assert "value_range" in result
-        assert "min" in result["value_range"]
-        assert "max" in result["value_range"]
-        assert "mean" in result["value_range"]
+        stats = result["statistics"]
+        assert "count" in stats
+        assert "min" in stats
+        assert "max" in stats
+        assert "average" in stats
 
         # Verify statistics make sense
-        assert result["value_range"]["min"] <= result["value_range"]["max"]
-        assert result["value_range"]["min"] <= result["value_range"]["mean"] <= result["value_range"]["max"]
+        assert stats["min"] <= stats["max"]
+        assert stats["min"] <= stats["average"] <= stats["max"]
+        assert stats["count"] == len(result["data"])
 
     @pytest.mark.asyncio
-    async def test_plot_default_chart_type(self, plot_tool):
-        """Test that default chart type is line."""
-        result = await plot_tool.execute({
-            "series_id": "CUUR0000SA0"
-        })
+    async def test_date_range_included(self, plot_tool):
+        """Test that date range is included."""
+        result = await plot_tool.execute({})
 
         assert result["status"] == "success"
-        assert result["chart_type"] == "line"
+        assert "date_range" in result
+        assert "start" in result["date_range"]
+        assert "end" in result["date_range"]
+
+        # Verify dates are in YYYY-MM format
+        start = result["date_range"]["start"]
+        end = result["date_range"]["end"]
+        assert len(start.split("-")) == 2
+        assert len(end.split("-")) == 2
 
     @pytest.mark.asyncio
-    async def test_plot_includes_metadata(self, plot_tool):
-        """Test that plot includes series metadata."""
-        result = await plot_tool.execute({
-            "series_id": "CUUR0000SA0"
-        })
+    async def test_plot_instructions_included(self, plot_tool):
+        """Test that plot instructions are included."""
+        result = await plot_tool.execute({})
 
         assert result["status"] == "success"
-        assert "title" in result
-        assert len(result["title"]) > 0
+        assert "plot_instructions" in result
+
+        instructions = result["plot_instructions"]
+        assert "chart_type" in instructions
+        assert "x_axis" in instructions
+        assert "y_axis" in instructions
+        assert "title" in instructions
+        assert "x_label" in instructions
+        assert "y_label" in instructions
+
+        # Verify instruction values
+        assert instructions["chart_type"] == "line"
+        assert instructions["x_axis"] == "date"
+        assert instructions["y_axis"] == "value"
+
+    @pytest.mark.asyncio
+    async def test_data_sorted_chronologically(self, plot_tool):
+        """Test that data is sorted from oldest to newest."""
+        result = await plot_tool.execute({})
+
+        assert result["status"] == "success"
+
+        dates = [point["date"] for point in result["data"]]
+
+        # Verify dates are in ascending order
+        for i in range(len(dates) - 1):
+            assert dates[i] <= dates[i + 1], f"Dates not sorted: {dates[i]} should be <= {dates[i + 1]}"
+
+    @pytest.mark.asyncio
+    async def test_series_title_included(self, plot_tool):
+        """Test that series title is included."""
+        result = await plot_tool.execute({})
+
+        assert result["status"] == "success"
+        assert "series_title" in result
+        assert len(result["series_title"]) > 0
+        assert "CPI" in result["series_title"] or "Consumer Price Index" in result["series_title"]
+
+    @pytest.mark.asyncio
+    async def test_no_parameters_required(self, plot_tool):
+        """Test that tool works with no parameters."""
+        result = await plot_tool.execute({})
+
+        assert result["status"] == "success"
         assert result["series_id"] == "CUUR0000SA0"
-
-    @pytest.mark.asyncio
-    async def test_plot_invalid_input(self, plot_tool):
-        """Test plotting with invalid input."""
-        result = await plot_tool.execute({
-            "chart_type": "invalid_type"
-            # Missing required series_id
-        })
-
-        assert result["status"] == "error"
-        assert "error" in result

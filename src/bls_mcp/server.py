@@ -7,7 +7,7 @@ from typing import Any, Sequence
 from dotenv import load_dotenv
 from mcp.server import Server
 from mcp.server.stdio import stdio_server
-from mcp.types import Tool, TextContent, ImageContent
+from mcp.types import Tool, TextContent
 
 from .data.mock_data import MockDataProvider
 from .tools.get_series import GetSeriesTool
@@ -15,17 +15,8 @@ from .tools.get_series_info import GetSeriesInfoTool
 from .tools.list_series import ListSeriesTool
 from .utils.logger import get_logger, setup_logging
 
-# Try to import visualization tool (optional dependency)
-try:
-    from .tools.plot_series import PlotSeriesTool
-    VISUALIZATION_AVAILABLE = True
-except ImportError:
-    VISUALIZATION_AVAILABLE = False
-    logger = get_logger(__name__)
-    logger.warning(
-        "Visualization tools not available. "
-        "Install with: uv sync --extra viz"
-    )
+# Import visualization tool (no longer requires matplotlib)
+from .tools.plot_series import PlotSeriesTool
 
 # Load environment variables
 load_dotenv()
@@ -57,14 +48,10 @@ class BLSMCPServer:
             "get_series": GetSeriesTool(self.data_provider),
             "list_series": ListSeriesTool(self.data_provider),
             "get_series_info": GetSeriesInfoTool(self.data_provider),
+            "plot_series": PlotSeriesTool(self.data_provider),
         }
 
-        # Add visualization tool if available
-        if VISUALIZATION_AVAILABLE:
-            self.tools["plot_series"] = PlotSeriesTool(self.data_provider)
-            logger.info("Visualization tool (plot_series) registered")
-        else:
-            logger.info("Visualization tool not available (install with: uv sync --extra viz)")
+        logger.info("All tools registered (including plot_series)")
 
         # Register handlers
         self._register_handlers()
@@ -88,7 +75,7 @@ class BLSMCPServer:
             ]
 
         @self.server.call_tool()
-        async def call_tool(name: str, arguments: dict[str, Any]) -> Sequence[TextContent | ImageContent]:
+        async def call_tool(name: str, arguments: dict[str, Any]) -> Sequence[TextContent]:
             """Call a tool by name with arguments."""
             logger.info(f"Tool called: {name}")
             logger.debug(f"Arguments: {arguments}")
@@ -107,33 +94,8 @@ class BLSMCPServer:
                 # Convert result to JSON string for text content
                 import json
 
-                # Special handling for plot_series tool - return text + image
-                if name == "plot_series":
-                    logger.info("Processing plot_series response")
-
-                    if result.get("status") == "success":
-                        # Extract image data
-                        image_data = result.get("image", {}).get("data", "")
-                        logger.info(f"Image data length: {len(image_data)}")
-
-                        # Create a simple text description
-                        text_summary = (
-                            f"CPI All Items (CUUR0000SA0)\n"
-                            f"Data points: {result.get('data_points')}\n"
-                            f"Range: {result.get('date_range')}"
-                        )
-
-                        logger.info("Returning ImageContent")
-                        # Return both text and image
-                        return [
-                            TextContent(type="text", text=text_summary),
-                            ImageContent(type="image", data=image_data, mimeType="image/png")
-                        ]
-                    else:
-                        logger.warning(f"plot_series failed: {result.get('error')}")
-
-                # Default: return as JSON text
-                logger.info("Returning default JSON text response")
+                # Return as JSON text (all tools now return data, no images)
+                logger.info("Returning JSON text response")
                 result_text = json.dumps(result, indent=2)
                 return [TextContent(type="text", text=result_text)]
 
