@@ -74,18 +74,29 @@ mcp-inspector python scripts/start_server.py
 
 ## Project Status
 
-**Current Phase**: Phase 1 - Foundation
+**Current Phase**: Phase 2 - Enhanced Tools (Starting Visualization)
 
+### Phase 1 - Foundation ✅ COMPLETE
 - [x] Project structure created
 - [x] Configuration files set up
-- [ ] Mock data system implemented
-- [ ] Core MCP server implemented
-- [ ] Basic tools implemented
-- [ ] Tests written
+- [x] Mock data system implemented (8 CPI series, 114 data points)
+- [x] Core MCP server implemented with stdio transport
+- [x] Basic tools implemented (get_series, list_series, get_series_info)
+- [x] 17 unit tests written (all passing)
+- [x] UV package manager integration
+- [x] SSE transport + ngrok support (bonus!)
+- [x] Claude Desktop integration guide
 
-## Available Tools (Phase 1)
+### Phase 2 - Enhanced Tools (In Progress)
+- [x] Simple visualization tool (static plots) - `plot_series` tool
+- [ ] Advanced analysis tools
+- [ ] Data comparison tools
 
-### `get_series`
+## Available Tools
+
+### Phase 1 Tools - Data Access
+
+#### `get_series`
 Fetch BLS data series by ID with optional date range filtering.
 
 **Parameters:**
@@ -105,18 +116,81 @@ Fetch BLS data series by ID with optional date range filtering.
 }
 ```
 
-### `list_series`
+#### `list_series`
 List available BLS series with optional filtering.
 
 **Parameters:**
 - `category` (string, optional): Filter by category (e.g., "CPI", "Employment")
 - `limit` (integer, optional): Maximum number of results (default: 50)
 
-### `get_series_info`
+#### `get_series_info`
 Get detailed metadata about a specific BLS series.
 
 **Parameters:**
 - `series_id` (string, required): BLS series ID
+
+### Phase 2 Tools - Data Formatting for Visualization
+
+#### `plot_series`
+Get CPI All Items (CUUR0000SA0) data formatted for client-side plotting.
+
+**Features:**
+- Returns structured time series data ready for plotting
+- No parameters needed - hardcoded to CPI All Items
+- Includes statistics (min, max, average)
+- Chronologically sorted data
+- Plot instructions for client-side rendering
+
+**Parameters:**
+- None required
+
+**Returns:**
+- `data`: Array of {date, value, year, month, period} objects
+- `statistics`: {count, min, max, average}
+- `date_range`: {start, end}
+- `plot_instructions`: Suggested chart settings
+- `series_title`: Full series name
+
+**Example:**
+```json
+{
+  "name": "plot_series",
+  "arguments": {}
+}
+```
+
+**Example Response:**
+```json
+{
+  "status": "success",
+  "series_id": "CUUR0000SA0",
+  "series_title": "Consumer Price Index for All Urban Consumers: All Items",
+  "data": [
+    {"date": "2020-01", "value": 257.971, "year": "2020", "month": "01", "period": "M01"},
+    ...
+  ],
+  "statistics": {
+    "count": 60,
+    "min": 257.971,
+    "max": 314.540,
+    "average": 285.234
+  },
+  "date_range": {
+    "start": "2020-01",
+    "end": "2024-12"
+  },
+  "plot_instructions": {
+    "chart_type": "line",
+    "x_axis": "date",
+    "y_axis": "value",
+    "title": "Consumer Price Index for All Urban Consumers: All Items",
+    "x_label": "Date",
+    "y_label": "Index Value"
+  }
+}
+```
+
+**Note:** This tool returns data for client-side plotting, not pre-rendered images. The client (ChatGPT, Claude, etc.) can use this data to create charts in their own environment.
 
 ## Architecture
 
@@ -201,23 +275,27 @@ mypy src/
 
 ## Roadmap
 
-### Phase 1: Foundation (Current)
+### Phase 1: Foundation ✅ COMPLETE
 - [x] Project setup and configuration
-- [ ] Mock data system
-- [ ] Core MCP server with stdio transport
-- [ ] Basic tools (get_series, list_series, get_series_info)
-- [ ] Unit tests
+- [x] Mock data system
+- [x] Core MCP server with stdio transport
+- [x] Basic tools (get_series, list_series, get_series_info)
+- [x] Unit tests (17 tests, all passing)
+- [x] UV package manager integration
+- [x] SSE transport implementation (bonus!)
+- [x] ngrok integration (bonus!)
+- [x] Claude Desktop integration guide
 
-### Phase 2: Remote Access
-- [ ] SSE transport implementation
-- [ ] ngrok integration
+### Phase 2: Enhanced Tools (In Progress)
+- [ ] Visualization tools (simple static plots)
+- [ ] Data comparison and analysis tools
 - [ ] Multi-LLM client testing
-- [ ] Enhanced tools with visualization
+- [ ] Enhanced error handling and validation
 
 ### Phase 3: Advanced Features
 - [ ] MCP resources (catalogs, documentation)
 - [ ] Pre-built prompts for analysis
-- [ ] Advanced analysis tools
+- [ ] Advanced visualization (interactive charts)
 - [ ] Migration path to real BLS data
 
 ## Configuration

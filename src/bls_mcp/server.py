@@ -15,6 +15,9 @@ from .tools.get_series_info import GetSeriesInfoTool
 from .tools.list_series import ListSeriesTool
 from .utils.logger import get_logger, setup_logging
 
+# Import visualization tool (no longer requires matplotlib)
+from .tools.plot_series import PlotSeriesTool
+
 # Load environment variables
 load_dotenv()
 
@@ -45,7 +48,10 @@ class BLSMCPServer:
             "get_series": GetSeriesTool(self.data_provider),
             "list_series": ListSeriesTool(self.data_provider),
             "get_series_info": GetSeriesInfoTool(self.data_provider),
+            "plot_series": PlotSeriesTool(self.data_provider),
         }
+
+        logger.info("All tools registered (including plot_series)")
 
         # Register handlers
         self._register_handlers()
@@ -83,11 +89,13 @@ class BLSMCPServer:
 
             try:
                 result = await tool.execute(arguments)
-                logger.debug(f"Tool result: {result}")
+                logger.info(f"Tool {name} returned status: {result.get('status')}")
 
                 # Convert result to JSON string for text content
                 import json
 
+                # Return as JSON text (all tools now return data, no images)
+                logger.info("Returning JSON text response")
                 result_text = json.dumps(result, indent=2)
                 return [TextContent(type="text", text=result_text)]
 

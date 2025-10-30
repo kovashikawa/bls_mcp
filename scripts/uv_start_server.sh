@@ -9,5 +9,5 @@ PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 
 cd "$PROJECT_DIR"
 
-# Run server with uv
-uv run python scripts/start_server.py
+# Run server with uv (use full path for Claude Desktop compatibility)
+/Users/rafaelkovashikawa/.local/bin/uv run python scripts/start_server.py

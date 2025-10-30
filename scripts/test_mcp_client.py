@@ -62,6 +62,21 @@ async def test_mcp_server():
                 },
             },
         },
+        # Plot series
+        {
+            "jsonrpc": "2.0",
+            "id": 6,
+            "method": "tools/call",
+            "params": {
+                "name": "plot_series",
+                "arguments": {
+                    "series_id": "CUUR0000SA0",
+                    "start_year": 2023,
+                    "end_year": 2024,
+                    "chart_type": "line",
+                },
+            },
+        },
     ]
 
     # Prepare input
@@ -91,6 +106,22 @@ async def test_mcp_server():
                 try:
                     response = json.loads(line)
                     print(f"\n📋 Response {i}:")
+
+                    # Check if response contains image content
+                    if "result" in response and "content" in response["result"]:
+                        content = response["result"]["content"]
+                        if isinstance(content, list):
+                            for item in content:
+                                if isinstance(item, dict) and item.get("type") == "image":
+                                    # Truncate base64 image data for display
+                                    item_copy = item.copy()
+                                    if "data" in item_copy:
+                                        data_len = len(item_copy["data"])
+                                        item_copy["data"] = f"<base64 image data: {data_len} chars>"
+                                    print(json.dumps({"type": "image", **item_copy}, indent=2))
+                                    print(f"  ✅ Image content detected! ({data_len} chars)")
+                                    continue
+
                     print(json.dumps(response, indent=2))
                 except json.JSONDecodeError:
                     print(f"⚠️  Could not parse response: {line}")
