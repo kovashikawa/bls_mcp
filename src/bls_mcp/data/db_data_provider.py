@@ -111,7 +111,7 @@ class DatabaseDataProvider:
                 "seasonality": first_row.get("seasonality", ""),
             }
 
-            # Convert data points to list of dicts
+            # Convert data points to list of dicts (minimal format - no footnotes)
             data_points = []
             for _, row in df.iterrows():
                 data_points.append({
@@ -119,7 +119,6 @@ class DatabaseDataProvider:
                     "period": row["period"],
                     "period_name": row.get("period_name", ""),
                     "value": str(row["value"]) if row["value"] is not None else "",
-                    "footnotes": row.get("footnotes", ""),
                 })
 
             logger.info(f"Retrieved {len(data_points)} data points for {series_id} from database")
