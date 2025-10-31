@@ -2,16 +2,22 @@
 
 import pytest
 
-from bls_mcp.data.mock_data import MockDataProvider
+from bls_mcp.data.db_data_provider import DatabaseDataProvider
 from bls_mcp.tools.get_series import GetSeriesTool
 from bls_mcp.tools.get_series_info import GetSeriesInfoTool
 from bls_mcp.tools.list_series import ListSeriesTool
 
+# Mark all tests in this file as integration tests (require database)
+pytestmark = pytest.mark.integration
+
 
 @pytest.fixture
 def data_provider():
-    """Create a mock data provider instance."""
-    return MockDataProvider()
+    """Create a database data provider instance."""
+    try:
+        return DatabaseDataProvider()
+    except Exception as e:
+        pytest.skip(f"Database not available: {e}")
 
 
 @pytest.fixture

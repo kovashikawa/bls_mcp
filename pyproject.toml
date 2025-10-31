@@ -51,6 +51,11 @@ viz = [
     "matplotlib>=3.8.0",
     "numpy>=1.26.0",
 ]
+database = [
+    "sqlalchemy>=2.0.0",
+    "psycopg2-binary>=2.9.0",
+    "pandas>=2.0.0",
+]
 
 [project.urls]
 Homepage = "https://github.com/kovashikawa/bls_mcp"
@@ -113,3 +118,6 @@ minversion = "7.0"
 addopts = "-ra -q --strict-markers"
 testpaths = ["tests"]
 asyncio_mode = "auto"
+markers = [
+    "integration: marks tests as integration (may require external services)",
+]

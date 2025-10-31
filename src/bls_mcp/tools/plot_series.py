@@ -4,7 +4,6 @@ from typing import Any, Dict
 
 from pydantic import BaseModel
 
-from ..data.mock_data import MockDataProvider
 from ..utils.logger import get_logger
 from .base import BaseTool
 
@@ -19,7 +18,7 @@ class PlotSeriesInput(BaseModel):
 class PlotSeriesTool(BaseTool):
     """Tool for returning CPI All Items (CUUR0000SA0) data for client-side plotting."""
 
-    def __init__(self, data_provider: MockDataProvider) -> None:
+    def __init__(self, data_provider: Any) -> None:
         """Initialize the plot series tool."""
         self.data_provider = data_provider
 

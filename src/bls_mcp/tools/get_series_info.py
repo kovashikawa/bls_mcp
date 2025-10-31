@@ -4,7 +4,6 @@ from typing import Any, Dict
 
 from pydantic import BaseModel, Field
 
-from ..data.mock_data import MockDataProvider
 from ..utils.logger import get_logger
 from ..utils.validators import validate_series_id
 from .base import BaseTool
@@ -21,7 +20,7 @@ class GetSeriesInfoInput(BaseModel):
 class GetSeriesInfoTool(BaseTool):
     """Tool for getting BLS series metadata."""
 
-    def __init__(self, data_provider: MockDataProvider) -> None:
+    def __init__(self, data_provider: Any) -> None:
         """Initialize tool with data provider."""
         self.data_provider = data_provider
 

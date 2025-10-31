@@ -9,7 +9,7 @@ from mcp.server import Server
 from mcp.server.stdio import stdio_server
 from mcp.types import Tool, TextContent
 
-from .data.mock_data import MockDataProvider
+from .data.db_data_provider import DatabaseDataProvider
 from .tools.get_series import GetSeriesTool
 from .tools.get_series_info import GetSeriesInfoTool
 from .tools.list_series import ListSeriesTool
@@ -38,10 +38,18 @@ class BLSMCPServer:
         # Create MCP server
         self.server = Server("bls-mcp-server")
 
-        # Initialize data provider
-        data_provider_type = os.getenv("DATA_PROVIDER", "mock")
-        logger.info(f"Using data provider: {data_provider_type}")
-        self.data_provider = MockDataProvider()
+        # Initialize database data provider
+        logger.info("Initializing database data provider")
+        try:
+            self.data_provider = DatabaseDataProvider()
+            logger.info("Database provider initialized successfully")
+        except Exception as e:
+            logger.error(f"Failed to initialize database provider: {e}")
+            logger.error("Cannot start server without database connection")
+            raise RuntimeError(
+                "Database connection required. "
+                "Please ensure PostgreSQL is running and configured in .env"
+            ) from e
 
         # Initialize tools
         self.tools = {
