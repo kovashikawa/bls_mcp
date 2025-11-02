@@ -2,6 +2,10 @@
 
 A standalone MCP (Model Context Protocol) server for Bureau of Labor Statistics (BLS) data, designed to work with multiple LLM clients through both local and remote connections.
 
+<a href="https://glama.ai/mcp/servers/@kovashikawa/bls_mcp">
+  <img width="380" height="200" src="https://glama.ai/mcp/servers/@kovashikawa/bls_mcp/badge" alt="BLS Server MCP server" />
+</a>
+
 ## Features
 
 - **Official MCP SDK**: Built with the official `mcp` Python SDK for full protocol control
