@@ -54,6 +54,17 @@ async def main():
     print(f"Data points: {len(result['data'])}")
     print()
 
+    print("=" * 70)
+    print("DATA QUALITY METRICS")
+    print("=" * 70)
+    dq = result['data_quality']
+    print(f"Has gaps:    {dq['has_gaps']}")
+    print(f"Data points: {dq['data_points']}")
+    print(f"Date range:  {dq['date_range']}")
+    print(f"Frequency:   {dq['frequency']}")
+    print(f"Notes:       {dq['notes']}")
+    print()
+
     # Show first and last few data points
     print("=" * 70)
     print("SAMPLE DATA (First 5 and Last 5 Points)")
@@ -135,20 +146,24 @@ async def main():
     print("FILTERED DATA (2020-2023)")
     print("=" * 70)
     print(f"Filtered to {len(result_filtered['data'])} points (vs {len(result['data'])} total)")
-    print(f"Date range: {result_filtered['data'][0]['date']} to {result_filtered['data'][-1]['date']}")
+    dq_filtered = result_filtered['data_quality']
+    print(f"Date range: {dq_filtered['date_range']}")
+    print(f"Frequency:  {dq_filtered['frequency']}")
     print()
 
     print("=" * 70)
     print("✅ Demo Complete!")
     print("=" * 70)
     print()
-    print("Benefits of minimal JSON format:")
+    print("Benefits of this format:")
     print("  • Small payload size (date + value only)")
     print("  • LLMs won't truncate or omit data")
     print("  • Clean, readable format")
     print("  • Easy to parse and visualize")
     print("  • Works with any charting library")
     print("  • Supports optional year range filtering")
+    print("  • Includes data quality metrics for context")
+    print("  • Frequency and gap detection built-in")
     print()
 
 

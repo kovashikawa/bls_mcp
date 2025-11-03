@@ -13,10 +13,9 @@ from .data.db_data_provider import DatabaseDataProvider
 from .tools.get_series import GetSeriesTool
 from .tools.get_series_info import GetSeriesInfoTool
 from .tools.list_series import ListSeriesTool
-from .utils.logger import get_logger, setup_logging
-
-# Import visualization tool (no longer requires matplotlib)
 from .tools.plot_series import PlotSeriesTool
+from .tools.seasonality_analysis import SeasonalityAnalysisTool
+from .utils.logger import get_logger, setup_logging
 
 # Load environment variables
 load_dotenv()
@@ -57,9 +56,10 @@ class BLSMCPServer:
             "list_series": ListSeriesTool(self.data_provider),
             "get_series_info": GetSeriesInfoTool(self.data_provider),
             "plot_series": PlotSeriesTool(self.data_provider),
+            "seasonality_analysis": SeasonalityAnalysisTool(self.data_provider),
         }
 
-        logger.info("All tools registered (including plot_series)")
+        logger.info("All 5 tools registered successfully")
 
         # Register handlers
         self._register_handlers()

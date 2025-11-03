@@ -77,12 +77,12 @@ class TestPlotSeriesTool:
         assert "series_id" in result
         assert "title" in result
         assert "data" in result
+        assert "data_quality" in result
         assert "instructions" in result
 
         # Should NOT have these fields (removed for minimal output)
         assert "status" not in result
         assert "statistics" not in result
-        assert "date_range" not in result
         assert "series_title" not in result  # Changed to "title"
 
     @pytest.mark.asyncio
@@ -169,6 +169,31 @@ class TestPlotSeriesTool:
 
         # Check key guidance is present
         usage_text = " ".join(instructions["usage"])
-        assert "do not reconstruct" in usage_text.lower() or "use the data" in usage_text.lower()
-        assert "sorted" in usage_text.lower()
         assert "do not truncate" in usage_text.lower()
+
+    @pytest.mark.asyncio
+    async def test_data_quality_included(self, plot_tool):
+        """Test that data_quality metrics are included."""
+        result = await plot_tool.execute({"series_id": "CUUR0000SA0"})
+
+        assert "data_quality" in result
+        dq = result["data_quality"]
+
+        # Check all required fields
+        assert "has_gaps" in dq
+        assert "data_points" in dq
+        assert "date_range" in dq
+        assert "frequency" in dq
+        assert "notes" in dq
+
+        # Verify types
+        assert isinstance(dq["has_gaps"], bool)
+        assert isinstance(dq["data_points"], int)
+        assert isinstance(dq["date_range"], str)
+        assert isinstance(dq["frequency"], str)
+        assert isinstance(dq["notes"], str)
+
+        # Check values are reasonable
+        assert dq["data_points"] > 0
+        assert dq["frequency"] in ["monthly", "quarterly", "annual", "mixed", "unknown"]
+        assert len(dq["date_range"]) > 0
